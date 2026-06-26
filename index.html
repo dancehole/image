@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub 图床管理</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="common/favicon.ico">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="common/favicon3.ico" alt="Logo" class="logo-img">
+                <h1>图床管理</h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active" data-view="gallery">
+                    <span class="nav-icon">🖼️</span>
+                    <span>图片浏览</span>
+                </div>
+                <div class="nav-item" data-view="upload">
+                    <span class="nav-icon">📤</span>
+                    <span>上传图片</span>
+                </div>
+                <div class="nav-item" data-view="history">
+                    <span class="nav-icon">📋</span>
+                    <span>上传历史</span>
+                </div>
+                <div class="nav-item" data-view="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>设置</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="storage-info">
+                    <div class="storage-label">存储空间</div>
+                    <div class="storage-bar">
+                        <div class="storage-used" id="storageUsedBar"></div>
+                    </div>
+                    <div class="storage-text" id="storageText">计算中...</div>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span class="breadcrumb-item active">全部图片</span>
+                    </div>
+                </div>
+                <div class="top-bar-right">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索图片..." autocomplete="off" spellcheck="false">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <button class="btn btn-primary" id="syncBtn" title="从GitHub同步">
+                        🔄 同步
+                    </button>
+                    <button class="btn btn-secondary" id="uploadBtnTop">
+                        📤 上传
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <div class="view-gallery view active" id="viewGallery">
+                    <div class="gallery-toolbar">
+                        <div class="toolbar-left">
+                            <div class="view-toggle">
+                                <button class="view-btn active" data-view-type="grid" title="网格视图">▦</button>
+                                <button class="view-btn" data-view-type="list" title="列表视图">≡</button>
+                            </div>
+                            <div class="sort-select">
+                                <select id="sortSelect">
+                                    <option value="name-asc">名称 ↑</option>
+                                    <option value="name-desc">名称 ↓</option>
+                                    <option value="date-desc">最新上传 ↑</option>
+                                    <option value="date-asc">最早上传 ↓</option>
+                                    <option value="size-desc">大小 ↑</option>
+                                    <option value="size-asc">大小 ↓</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="toolbar-right">
+                            <span class="image-count" id="imageCount">0 张图片</span>
+                            <button class="btn btn-small btn-danger" id="batchDeleteBtn" style="display:none;">
+                                🗑️ 批量删除
+                            </button>
+                            <button class="btn btn-small" id="selectAllBtn" style="display:none;">
+                                ☐ 全选
+                            </button>
+                            <button class="btn btn-small" id="batchModeBtn">
+                                ✓ 批量操作
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="category-bar" id="categoryBar">
+                        <div class="category-item active" data-category="all">全部</div>
+                    </div>
+                    
+                    <div class="gallery-grid" id="galleryGrid">
+                        <div class="empty-state">
+                            <div class="empty-icon">📷</div>
+                            <div class="empty-text">暂无图片</div>
+                            <div class="empty-desc">点击上传按钮添加第一张图片</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-upload view" id="viewUpload">
+                    <div class="upload-container">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">☁️</div>
+                            <div class="upload-text">拖拽图片到此处，或点击选择文件</div>
+                            <div class="upload-hint">支持 JPG、PNG、GIF、WebP 等格式</div>
+                            <input type="file" id="fileInput" multiple accept="image/*" style="display:none;">
+                        </div>
+                        
+                        <div class="upload-settings">
+                            <h3>上传设置</h3>
+                            <div class="setting-group">
+                                <label class="setting-label">上传目录</label>
+                                <select id="uploadDir">
+                                    <option value="common">common</option>
+                                    <option value="notebooks">notebooks</option>
+                                    <option value="danceholeLabs">danceholeLabs</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <input type="checkbox" id="enableCompress" checked>
+                                    启用图片压缩
+                                </label>
+                                <div class="setting-sub">
+                                    <label>压缩质量</label>
+                                    <input type="range" id="compressQuality" min="10" max="100" value="80">
+                                    <span id="qualityValue">80%</span>
+                                </div>
+                                <div class="setting-sub">
+                                    <label>最大宽度 (px)</label>
+                                    <input type="number" id="maxWidth" value="1920" min="100" step="100">
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <input type="checkbox" id="enableWatermark">
+                                    启用水印
+                                </label>
+                                <div class="setting-sub" id="watermarkSettings" style="display:none;">
+                                    <label>水印文字</label>
+                                    <input type="text" id="watermarkText" placeholder="请输入水印文字" value="@dancehole">
+                                    <div class="watermark-row">
+                                        <div class="watermark-col">
+                                            <label>位置</label>
+                                            <select id="watermarkPosition">
+                                                <option value="bottom-right">右下角</option>
+                                                <option value="bottom-left">左下角</option>
+                                                <option value="top-right">右上角</option>
+                                                <option value="top-left">左上角</option>
+                                                <option value="center">居中</option>
+                                            </select>
+                                        </div>
+                                        <div class="watermark-col">
+                                            <label>透明度</label>
+                                            <input type="range" id="watermarkOpacity" min="10" max="100" value="30">
+                                            <span id="opacityValue">30%</span>
+                                        </div>
+                                    </div>
+                                    <div class="watermark-row">
+                                        <div class="watermark-col">
+                                            <label>字体大小</label>
+                                            <input type="number" id="watermarkFontSize" value="24" min="12" max="100">
+                                        </div>
+                                        <div class="watermark-col">
+                                            <label>字体颜色</label>
+                                            <input type="color" id="watermarkColor" value="#ffffff">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <input type="checkbox" id="autoRename">
+                                    自动重命名（时间戳）
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-queue" id="uploadQueue" style="display:none;">
+                            <h3>上传队列</h3>
+                            <div class="queue-list" id="queueList"></div>
+                            <div class="queue-actions">
+                                <button class="btn btn-primary" id="startUploadBtn">开始上传</button>
+                                <button class="btn btn-secondary" id="clearQueueBtn">清空队列</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-history view" id="viewHistory">
+                    <div class="history-container">
+                        <div class="history-header">
+                            <h2>上传历史</h2>
+                            <button class="btn btn-secondary btn-small" id="clearHistoryBtn">清空历史</button>
+                        </div>
+                        <div class="history-list" id="historyList">
+                            <div class="empty-state">
+                                <div class="empty-icon">📋</div>
+                                <div class="empty-text">暂无上传记录</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-settings view" id="viewSettings">
+                    <div class="settings-container">
+                        <h2>设置</h2>
+                        
+                        <div class="settings-section">
+                            <h3>GitHub 配置</h3>
+                            <div class="setting-item">
+                                <label>GitHub Token</label>
+                                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                                <div class="setting-hint">需要 repo 权限，<a href="https://github.com/settings/tokens" target="_blank">去创建</a></div>
+                            </div>
+                            <div class="setting-item">
+                                <label>用户名</label>
+                                <input type="text" id="githubUsername" placeholder="your-username">
+                            </div>
+                            <div class="setting-item">
+                                <label>仓库名</label>
+                                <input type="text" id="githubRepo" placeholder="image">
+                            </div>
+                            <div class="setting-item">
+                                <label>分支名</label>
+                                <input type="text" id="githubBranch" value="main" placeholder="main">
+                            </div>
+                            <div class="setting-item">
+                                <label>自定义域名 (可选)</label>
+                                <input type="text" id="customDomain" placeholder="https://cdn.example.com">
+                                <div class="setting-hint">填写后将使用自定义域名访问图片，如 jsDelivr CDN</div>
+                            </div>
+                            <button class="btn btn-primary" id="saveSettingsBtn">保存设置</button>
+                            <button class="btn btn-secondary" id="testConnectionBtn">测试连接</button>
+                            <span id="testResult" class="test-result"></span>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>本地索引</h3>
+                            <div class="setting-item">
+                                <label>索引状态</label>
+                                <div id="indexStatus">未生成</div>
+                            </div>
+                            <button class="btn btn-secondary" id="buildIndexBtn">重建本地索引</button>
+                            <button class="btn btn-secondary" id="exportIndexBtn">导出索引</button>
+                            <button class="btn btn-secondary" id="importIndexBtn">导入索引</button>
+                            <input type="file" id="importFileInput" accept=".json" style="display:none;">
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>显示设置</h3>
+                            <div class="setting-item">
+                                <label>默认视图</label>
+                                <select id="defaultView">
+                                    <option value="grid">网格视图</option>
+                                    <option value="list">列表视图</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label>图片链接格式</label>
+                                <select id="linkFormat">
+                                    <option value="url">原始 URL</option>
+                                    <option value="markdown">Markdown 格式</option>
+                                    <option value="html">HTML 格式</option>
+                                    <option value="bbcode">BBCode 格式</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>数据管理</h3>
+                            <button class="btn btn-danger" id="resetAllBtn">重置所有数据</button>
+                            <div class="setting-hint">将清除所有本地设置和缓存数据</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="imageModal">
+        <div class="modal-overlay" data-close="modal"></div>
+        <div class="modal-content modal-image">
+            <button class="modal-close" data-close="modal">✕</button>
+            <div class="image-preview-container">
+                <img id="previewImage" src="" alt="Preview">
+            </div>
+            <div class="image-info-panel">
+                <div class="info-section">
+                    <div class="info-label">文件名</div>
+                    <div class="info-value" id="infoName">-</div>
+                </div>
+                <div class="info-section">
+                    <div class="info-label">路径</div>
+                    <div class="info-value" id="infoPath">-</div>
+                </div>
+                <div class="info-section">
+                    <div class="info-label">大小</div>
+                    <div class="info-value" id="infoSize">-</div>
+                </div>
+                <div class="info-section">
+                    <div class="info-label">链接</div>
+                    <div class="link-input-group">
+                        <input type="text" id="infoUrl" readonly>
+                        <button class="btn btn-small btn-primary" id="copyLinkBtn">复制</button>
+                    </div>
+                </div>
+                <div class="info-actions">
+                    <button class="btn btn-secondary" id="renameBtn">✏️ 重命名</button>
+                    <button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button>
+                    <button class="btn btn-secondary" id="downloadBtn">⬇️ 下载</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="renameModal">
+        <div class="modal-overlay" data-close="rename"></div>
+        <div class="modal-content modal-small">
+            <h3>重命名</h3>
+            <input type="text" id="renameInput" placeholder="输入新文件名">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" data-close="rename">取消</button>
+                <button class="btn btn-primary" id="confirmRenameBtn">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/image-utils.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
