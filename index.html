@@ -32,6 +32,10 @@
                     <span class="nav-icon">⚙️</span>
                     <span>设置</span>
                 </div>
+                <div class="nav-item" data-view="about">
+                    <span class="nav-icon">ℹ️</span>
+                    <span>关于</span>
+                </div>
             </nav>
             
             <div class="sidebar-footer">
@@ -286,6 +290,73 @@
                             <h3>数据管理</h3>
                             <button class="btn btn-danger" id="resetAllBtn">重置所有数据</button>
                             <div class="setting-hint">将清除所有本地设置和缓存数据</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-about view" id="viewAbout">
+                    <div class="about-container">
+                        <div class="about-header">
+                            <div class="about-logo">
+                                <img src="common/favicon3.ico" alt="Logo">
+                            </div>
+                            <h1>GitHub 图床管理系统</h1>
+                            <p class="about-subtitle">Image Bed Management System</p>
+                        </div>
+                        
+                        <div class="about-content">
+                            <div class="about-card">
+                                <h2>📋 项目简介</h2>
+                                <p>这是一个基于 GitHub 的图床管理系统，利用 GitHub 仓库作为图片存储后端，通过 GitHub API 进行图片的上传、管理和浏览。</p>
+                                <p>系统支持前端图片压缩、水印添加、分类管理等功能，可部署到 GitHub Pages 实现在线访问。</p>
+                            </div>
+                            
+                            <div class="about-card">
+                                <h2>🌟 主要功能</h2>
+                                <ul>
+                                    <li>🖼️ 图片浏览（网格/列表视图）</li>
+                                    <li>📤 拖拽上传（支持批量）</li>
+                                    <li>🗜️ 图片压缩（自定义质量）</li>
+                                    <li>🏷️ 水印添加（自定义位置、颜色）</li>
+                                    <li>🔍 分类筛选与搜索</li>
+                                    <li>📋 上传历史记录</li>
+                                    <li>🔗 多种链接格式（URL、Markdown、HTML、BBCode）</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="about-card">
+                                <h2>🛠️ 技术栈</h2>
+                                <ul>
+                                    <li>HTML5 / CSS3 / JavaScript</li>
+                                    <li>jQuery 3.x</li>
+                                    <li>GitHub REST API</li>
+                                    <li>jsDelivr CDN</li>
+                                    <li>GitHub Pages + Actions</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="about-card">
+                                <h2>🤝 作者信息</h2>
+                                <div class="author-info">
+                                    <div class="author-avatar">👤</div>
+                                    <div class="author-detail">
+                                        <div class="author-name">dancehole</div>
+                                        <div class="author-links">
+                                            <a href="https://github.com/dancehole" target="_blank" class="author-link">
+                                                <span>📁</span> GitHub 主页
+                                            </a>
+                                            <a href="https://github.com/dancehole/image" target="_blank" class="author-link">
+                                                <span>📦</span> 项目仓库
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="about-card">
+                                <h2>📄 许可证</h2>
+                                <p>MIT License</p>
+                            </div>
                         </div>
                     </div>
                 </div>
